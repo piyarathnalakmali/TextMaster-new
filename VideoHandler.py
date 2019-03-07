@@ -79,8 +79,6 @@ class VideoHandler:
                     print (len(good_points))
                     if (len(good_points)>175):
                         self.similarFrames.append(self.object_array[i+1].path)
-                        print(self.images)
-                        print(self.object_array[i+1].name)
                         self.images.remove(self.object_array[i+1].name)
         for i in self.similarFrames:
             os.remove(i)
@@ -95,5 +93,7 @@ class VideoHandler:
         f= open("Text.txt","a")
         for x in self.images:
             text = pytesseract.image_to_string(Image.open('./data/'+x))
-            f.write(text)
+            f.write(text+"\n"+"---------------PAGE BREAK----------------------------------"+"\n")
         f.close()
+        textFile=open("Text.txt","r")
+        return textFile.readlines()

@@ -1,0 +1,14 @@
+{% extends 'layout.html' %}
+{% block body %}
+  TEXT FILE GENERATED <br>
+  <form action = "/editTextFile" method = "POST">
+    Edit text file
+    <br />
+    <textarea rows="50" cols="200" name="text">
+      {% for result in variable%}
+        {{ result }}
+      {% endfor %}
+    </textarea>
+    <input type = "submit" value = "Save Changes" />
+  </form>
+{% endblock %}

@@ -36,15 +36,24 @@ def upload():
         file.save(destination)
         video = Video(filename,destination)
         videoHandler.addVideo(video)
-    return render_template("complete.html",variable=video.path)
+    return render_template("generateText.html",variable=video.path)
 
 @app.route("/generateTextFile")
 def generateTextFile():
     video=videoHandler.videos[0]
     videoHandler.splitVideo(video)
     videoHandler.compareImages()
-    videoHandler.generateTextFile()
-    return render_template('textGenerated.html')
+    text=videoHandler.generateTextFile()
+    return render_template('editText.html',variable=text)
+
+@app.route("/editTextFile" , methods=["POST"])
+def editTextFile():
+    editedText=request.form['text']
+    print (editedText)
+    f= open("Text.txt","w")
+    f.write(editedText)
+    f.close()
+    return editedText
 
 if __name__ == '__main__':
     app.run(debug=True)
