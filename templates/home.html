@@ -1,7 +1,22 @@
 {% extends 'layout.html' %}
 {% block body %}
-  <form id="Upload-form" action="{{ url_for('upload')}}" method="POST" enctype="multipart/form-data">
-    <input type="file" name="file" accept="video/*">
-    <input type="submit" value="send">
-  </form>
+<header class="masthead" style="background-image: url({{ url_for('static', filename='img/home-bg.jpg') }})">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="site-heading">
+            <h1>Clean Blog</h1>
+            <span class="subheading">A Blog Theme by Start Bootstrap</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+<a href="uploadVideo-storage">
+  <button type="button" class="btn btn-primary btn-lg">Upload video from Storage</button>
+</a>
+<a href="uploadVideo-link">
+  <button type="button" class="btn btn-primary btn-lg">Upload video by Link</button>
+</a>
 {% endblock %}

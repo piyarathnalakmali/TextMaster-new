@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+{% block body %}
+<header class="masthead" style="background-image: url({{ url_for('static', filename='img/home-bg.jpg') }})">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="site-heading">
+            <h1>Upload video</h1>
+            <span class="subheading">You can now upload videos from your local storage</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <form id="Upload-form" action="{{ url_for('upload')}}" method="POST" enctype="multipart/form-data">
+    <input type="file" name="file" accept="video/*">
+    <input type="submit" value="Upload">
+  </form>
+{% endblock %}
