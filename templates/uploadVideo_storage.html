@@ -12,10 +12,18 @@
         </div>
       </div>
     </div>
-  </header>
+</header>
 
   <form id="Upload-form" action="{{ url_for('upload')}}" method="POST" enctype="multipart/form-data">
-    <input type="file" name="file" accept="video/*">
-    <input type="submit" value="Upload">
+    <input type="file" name="file" accept="video/*" onchange="handleFiles(this.files)">
+
+    <input type="submit" value="Upload" >
   </form>
+
+  <script type="text/javascript">
+    function handleFiles(file){
+      console.log(file[0].name);
+      localStorage.setItem("name",file[0].name);
+    }
+  </script>
 {% endblock %}

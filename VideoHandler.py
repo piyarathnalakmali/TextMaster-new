@@ -16,6 +16,11 @@ class VideoHandler:
     def addVideo(self,video):
         self.videos.append(video)
 
+    def getVideoByName(self,name):
+        for video in self.videos:
+            if video.getName()==name:
+                return video
+
     def splitVideo(self,video):
 
         try:

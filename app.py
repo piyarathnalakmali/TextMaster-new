@@ -59,9 +59,11 @@ def uploadByLink():
         f.write(r.content)
     return render_template("generateText.html",variable=video.path)
 
-@app.route("/generateTextFile")
+@app.route("/generateTextFile" , methods=["POST"])
 def generateTextFile():
-    video=videoHandler.videos[0]
+    text = request.form['text']
+    print(text)
+    video=videoHandler.getVideoByName(text)
     videoHandler.splitVideo(video)
     videoHandler.compareImages()
     text=videoHandler.generateTextFile()

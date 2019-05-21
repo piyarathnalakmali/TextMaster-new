@@ -12,8 +12,19 @@
         </div>
       </div>
     </div>
-  </header>
-  <form action="/generateTextFile">
-    <input type="submit" value="Generate Text File">
+</header>
+<body onload="autoFillName()">
+  <form action="/generateTextFile" method="POST">
+    <input type="text" id="videoName" name="text">
+    <input type="submit" value="Generate Text File" >
   </form>
+</body>
+<script type="text/javascript">
+  function autoFillName(){
+    var videoName = localStorage.getItem("name")
+    console.log(videoName);
+    var field=document.getElementById("videoName");
+    field.value=videoName;
+  }
+</script>
 {% endblock %}
