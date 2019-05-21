@@ -1,19 +1,9 @@
 {% extends 'layout.html' %}
 {% block body %}
-<header class="masthead" style="background-image: url({{ url_for('static', filename='img/home-bg.jpg') }})">
-    <div class="overlay"></div>
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 col-md-10 mx-auto">
-          <div class="site-heading">
-            <h1>Clean Blog</h1>
-            <span class="subheading">A Blog Theme by Start Bootstrap</span>
-          </div>
-        </div>
-      </div>
-    </div>
-</header>
+
 <body onload="autoFillName()">
+
+  <img src="{{url_for('video_feed')}}" style="width:1000px;height:600px;">
   <form action="/generateTextFile" method="POST">
     <input type="text" id="videoName" name="text">
     <input type="submit" value="Generate Text File" >
@@ -26,5 +16,9 @@
     var field=document.getElementById("videoName");
     field.value=videoName;
   }
+
+  jquery("videoName").ready(function(){
+    autoFillName();
+  })
 </script>
 {% endblock %}

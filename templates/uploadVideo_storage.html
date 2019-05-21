@@ -15,15 +15,67 @@
 </header>
 
   <form id="Upload-form" action="{{ url_for('upload')}}" method="POST" enctype="multipart/form-data">
-    <input type="file" name="file" accept="video/*" onchange="handleFiles(this.files)">
+    <div id="inputForm">
+      <input type="file" name="file" id="file" accept="video/*" >
 
-    <input type="submit" value="Upload" >
+      <button type="button" name="button" onclick="uploadFile()">Upload</button>
+      <progress id="progressBar" value="0" max="100" style="width:300px;"></progress>
+
+    </div>
+    <h3 id="status"></h3>
+    <p id="loaded_n_total"></p>
   </form>
+
+
 
   <script type="text/javascript">
     function handleFiles(file){
       console.log(file[0].name);
       localStorage.setItem("name",file[0].name);
     }
+
+    function _(el) {
+      return document.getElementById(el);
+    }
+var form = document.getElementById("Upload-form");
+function uploadFile() {
+
+  var file = _("file").files[0];
+  localStorage.setItem("name",file.name);
+  // alert(file.name+" | "+file.size+" | "+file.type);
+  var formdata = new FormData(form);
+  formdata.append("file", file);
+  var ajax = new XMLHttpRequest();
+  ajax.upload.addEventListener("progress", progressHandler, false);
+  ajax.addEventListener("load", completeHandler, false);
+  ajax.addEventListener("error", errorHandler, false);
+  ajax.addEventListener("abort", abortHandler, false);
+  ajax.open("POST", form.getAttribute('action'),true); // http://www.developphp.com/video/JavaScript/File-Upload-Progress-Bar-Meter-Tutorial-Ajax-PHP
+  //use file_upload_parser.php from above url
+  ajax.send(formdata);
+}
+
+function progressHandler(event) {
+  _("loaded_n_total").innerHTML = "Uploaded " + event.loaded + " bytes of " + event.total;
+  var percent = (event.loaded / event.total) * 100;
+  _("progressBar").value = Math.round(percent);
+  _("status").innerHTML = Math.round(percent) + "% uploaded... please wait";
+}
+
+function completeHandler(event) {
+  _("status").innerHTML = event.target.responseText;
+  _("progressBar").value = 0; //wil clear progress bar after successful upload
+  var element = document.getElementById("inputForm");
+  element.parentNode.removeChild(element);
+
+}
+
+function errorHandler(event) {
+  _("status").innerHTML = "Upload Failed";
+}
+
+function abortHandler(event) {
+  _("status").innerHTML = "Upload Aborted";
+}
   </script>
 {% endblock %}
