@@ -1,5 +1,8 @@
 import os
+import requests
+import pytube
 from flask import Flask , render_template , request , Response
+from pytube import YouTube
 from Video import Video
 from VideoHandler import VideoHandler
 from VideoCamera import VideoCamera
@@ -54,11 +57,17 @@ def upload():
 
 @app.route('/uploadByLink' , methods = ["POST"])
 def uploadByLink():
-    #url = request.args['url']
-    r = request.get(url)
-    print(request)
-    with app.open_instance_resource('downloaded_file', 'wb') as f:
-        f.write(r.content)
+    target=os.path.join(APP_ROOT, 'videos/')
+    if not os.path.isdir(target):
+        os.mkdir(target)
+    url = request.form['url']
+    yt = YouTube(url)
+    filename=yt.title
+    destination="/".join([target,filename])
+    stream=yt.streams.first()
+    stream.download(target)
+    video = Video(filename,destination)
+    videoHandler.addVideo(video)
     return render_template("generateText.html",variable=video.path)
 
 @app.route("/generateTextFile" , methods=["POST"])
