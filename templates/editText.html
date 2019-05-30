@@ -1,25 +1,27 @@
 
 {% block body %}
   <div class="row">
-<div class="col-sm-6">
-    <video width="690" height="500" controls>
+<div class="col-6">
+    <br>
+    <video width="690" height="500" controls style="margin-left: 5%">
   <source src="/video_feed?id={{variable}}" type="video/mp4">
      <track src="/video_text?id={{ variable }}" default kind="captions" srclang="en" label="English" />
 Your browser does not support the video tag.
 </video>
 </div>
-    <div class="col-sm-6">
+    <div class="col-6">
         <form action = "/editTextFile" method = "POST">
-      Text file of {{name}}
+      <div style="text-align: center">Text file of {{name}}</div>
       <br />
-      <textarea rows="20" cols="100" name="text">
-      {% for result in textData %}
-          {{ result }}
-        {% endfor %}
+      <textarea rows="20" cols="100" name="text" id="mytext">
+          {{ textData }}
       </textarea>
-      <input type = "submit" class="btn btn-primary" value = "Save Changes" />
+            <input type="hidden" name="user" id="user" value="{{ variable }}">
+      <input type="submit" class="btn btn-primary" value="Download Text file">
     </form>
     </div>
   </div>
+
+
 
 {% endblock %}

@@ -3,6 +3,7 @@ import codecs
 import requests
 import pytube
 import random
+import shutil
 from flask import Flask , render_template , request , Response,send_file
 from pytube import YouTube
 from Video import Video
@@ -98,11 +99,18 @@ def generateTextFile():
 @app.route("/editTextFile" , methods=["POST"])
 def editTextFile():
     editedText=request.form['text']
+    userId = request.form['user']
+    shutil.rmtree("data/"+userId)
     print (editedText)
-    f= open("Text.txt","w")
+    videoHandler.object_array =[]
+    videoHandler.similarFrames =[]
+    videoHandler.images =[]
+    videoHandler.videos=[]
+    f= open(userId+".txt","w")
     f.write(editedText)
     f.close()
-    return send_file('Text.txt',mimetype='text/plain',as_attachment=True)
+    return send_file(userId+".txt",mimetype='text/plain',as_attachment=True)
+
 
 def gen(camera):
     while True:

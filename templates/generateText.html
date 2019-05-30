@@ -1,6 +1,6 @@
 
 {% block body %}
-<video width="60%" height="60%" controls>
+<video width="690" height="500" controls>
   <source src="/video_feed?id={{variable}}" type="video/mp4">
 
 Your browser does not support the video tag.
@@ -8,8 +8,11 @@ Your browser does not support the video tag.
 
 <br><br>
 <form action="{{ url_for('generateTextFile')}}" id="genTextFile"" method="POST">
-  <button type="button" class="btn btn-primary" name="button" onclick="sendData()" >Generate Text File</button>
+  <button type="button" class="btn btn-primary" name="button" onclick="sendData()" id="gen" >Generate Text File</button>
   <h3></h3>
 </form>
+    <div id="loader">
+
+    </div>
 
 {% endblock %}

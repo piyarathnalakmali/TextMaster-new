@@ -142,7 +142,7 @@ class VideoHandler:
                         text+='- '+i+"\n"
                 temp = x.time
                 f.write("\n"+newTime+"\n"+finalText)
-                txtFile.write(finalText+"\n ------------------------------------ \n")
+                txtFile.write("\n"+finalText+" ------------------------------------ ")
                 finalText = text
             else:
                 temp = x.time
@@ -159,5 +159,6 @@ class VideoHandler:
         f.close()
         txtFile.close()
         txtFile = open("text/"+video.getId()+".txt","r",encoding='utf-8')
-        s = txtFile.readlines()
+        s = txtFile.read()
+
         return s
