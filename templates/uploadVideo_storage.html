@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block body %}
-<header class="masthead" style="background-image: url({{ url_for('static', filename='img/home-bg.jpg') }})">
+<header class="masthead" id="header" style="background-image: url({{ url_for('static', filename='img/home-bg.jpg') }})">
     <div class="overlay"></div>
     <div class="container">
       <div class="row">
@@ -14,68 +14,98 @@
     </div>
 </header>
 
+<div style="margin-left:35%">
   <form id="Upload-form" action="{{ url_for('upload')}}" method="POST" enctype="multipart/form-data">
     <div id="inputForm">
-      <input type="file" name="file" id="file" accept="video/*" >
-
-      <button type="button" name="button" onclick="uploadFile()">Upload</button>
-      <progress id="progressBar" value="0" max="100" style="width:300px;"></progress>
-
+      <input type="file" class="btn btn-primary"  name="file" id="file" accept="video/*">
+      <button type="button" class="btn btn-primary" name="button" onclick="uploadFile()">Upload</button>
+      <br><br>
+      Upload progress <br>
+      <progress id="progressBar" value="0" max="100" style="width:46%;"></progress>
     </div>
-    <h3 id="status"></h3>
-    <p id="loaded_n_total"></p>
+
   </form>
+</div>
+<h3 id="status"></h3>
+<p id="loaded_n_total"></p>
+<br><br><br>
+<p align="center" id="video"></p>
+<!--  -->
+<div class="" id="text_status">
+
+</div>
+<script type="text/javascript">
+
+  function _(el) {
+    return document.getElementById(el);
+  }
+
+  var form = document.getElementById("Upload-form");
+  function uploadFile() {
+
+    var file = _("file").files[0];
+    var formdata = new FormData();
+    formdata.append("file", file);
+    var user_id = localStorage.getItem("id");
+    formdata.append("user_id", user_id);
+
+    console.log(user_id);
 
 
-
-  <script type="text/javascript">
-    function handleFiles(file){
-      console.log(file[0].name);
-      localStorage.setItem("name",file[0].name);
-    }
-
-    function _(el) {
-      return document.getElementById(el);
-    }
-var form = document.getElementById("Upload-form");
-function uploadFile() {
-
-  var file = _("file").files[0];
-  localStorage.setItem("name",file.name);
-  // alert(file.name+" | "+file.size+" | "+file.type);
-  var formdata = new FormData(form);
-  formdata.append("file", file);
-  var ajax = new XMLHttpRequest();
-  ajax.upload.addEventListener("progress", progressHandler, false);
-  ajax.addEventListener("load", completeHandler, false);
-  ajax.addEventListener("error", errorHandler, false);
-  ajax.addEventListener("abort", abortHandler, false);
-  ajax.open("POST", form.getAttribute('action'),true); // http://www.developphp.com/video/JavaScript/File-Upload-Progress-Bar-Meter-Tutorial-Ajax-PHP
+    var ajax = new XMLHttpRequest();
+    ajax.upload.addEventListener("progress", progressHandler, false);
+    ajax.addEventListener("load", completeHandler, false);
+    ajax.addEventListener("error", errorHandler, false);
+    ajax.addEventListener("abort", abortHandler, false);
+    ajax.open("POST", form.getAttribute('action'),true); // http://www.developphp.com/video/JavaScript/File-Upload-Progress-Bar-Meter-Tutorial-Ajax-PHP
   //use file_upload_parser.php from above url
-  ajax.send(formdata);
-}
+    ajax.send(formdata);
+    console.log(formdata);
+  }
 
-function progressHandler(event) {
-  _("loaded_n_total").innerHTML = "Uploaded " + event.loaded + " bytes of " + event.total;
-  var percent = (event.loaded / event.total) * 100;
-  _("progressBar").value = Math.round(percent);
-  _("status").innerHTML = Math.round(percent) + "% uploaded... please wait";
-}
+  function progressHandler(event) {
 
-function completeHandler(event) {
-  _("status").innerHTML = event.target.responseText;
-  _("progressBar").value = 0; //wil clear progress bar after successful upload
-  var element = document.getElementById("inputForm");
-  element.parentNode.removeChild(element);
+    var percent = (event.loaded / event.total) * 100;
+    _("progressBar").value = Math.round(percent);
 
-}
+  }
 
-function errorHandler(event) {
-  _("status").innerHTML = "Upload Failed";
-}
+  function completeHandler(event) {
+    _("video").innerHTML = event.target.responseText;
+    _("progressBar").value = 0; //wil clear progress bar after successful upload
+    var element = document.getElementById("inputForm");
+    element.parentNode.removeChild(element);
+    var header = _("header");
+    header.parentNode.removeChild(header);
+  }
 
-function abortHandler(event) {
-  _("status").innerHTML = "Upload Aborted";
-}
-  </script>
+  function errorHandler(event) {
+    _("status").innerHTML = "Upload Failed";
+  }
+
+  function abortHandler(event) {
+    _("status").innerHTML = "Upload Aborted";
+  }
+
+  var newform = document.getElementById("genTextFile");
+  function sendData(){
+    console.log("sendData")
+    var formdata = new FormData();
+    var user_id = localStorage.getItem("id");
+    formdata.append("user_id", user_id);
+    var ajax = new XMLHttpRequest();
+    ajax.addEventListener("load", successHandler, false);
+    ajax.open("POST","{{ url_for('generateTextFile')}}",true);
+    ajax.send(formdata);
+  }
+  function successHandler(event) {
+    _("text_status").innerHTML = event.target.responseText;
+    var img = document.getElementById("video");
+    img.parentNode.removeChild(img);
+    var button = document.getElementById("genTextFile");
+    button.parentNode.removeChild(button);
+
+  }
+
+</script>
 {% endblock %}

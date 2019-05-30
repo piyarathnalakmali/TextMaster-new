@@ -14,9 +14,12 @@
     </div>
   </header>
 
+<div style="margin-left:35%">
   <form action="{{ url_for('uploadByLink')}}" method="POST">
-    URL for the video:<br>
-    <input type="url" name="url" id="url"><br>
-    <input type="submit" value="Submit">
+    URL for the video:<br><br>
+    <input type="url" name="url" style="height:50px;width:500px" id="url"><br><br>
+    <input type="submit" class="btn btn-primary" style="height:50px;width:500px" value="Submit">
   </form>
+</div>
+
 {% endblock %}

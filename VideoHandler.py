@@ -2,60 +2,86 @@ import cv2
 import numpy as np
 import os
 import math
-
+import codecs
 from Image import Image
+
 
 class VideoHandler:
     images = []
     videos = []
     object_array=[]
     similarFrames=[]
+
     def __init__(self):
         return None
 
+    def deleteVideo(self,video):
+        self.videos.remove(video)
+        os.remove(video.path)
+
     def addVideo(self,video):
+        for exVideo in self.videos:
+            if exVideo.user==video.user:
+                self.deleteVideo(exVideo)
         self.videos.append(video)
 
-    def getVideoByName(self,name):
+    def getVideoByUserId(self,user_id):
         for video in self.videos:
-            if video.getName()==name:
+            if video.getId()==user_id:
                 return video
 
+    def convertTime(self,millis):
+        millis = int(millis)
+        seconds = (millis / 1000) % 60
+        seconds = int(seconds)
+        minutes = (millis / (1000 * 60)) % 60
+        minutes = int(minutes)
+        hours = int(math.floor((millis / (1000 * 60 * 60)) % 24))
+        return "%02d"%(minutes,)+":"+"%02d"%(seconds,)+".000"
     def splitVideo(self,video):
 
         try:
-            if not os.path.exists('data'):
-                os.makedirs('data')
+            if not os.path.exists('data/'+video.getId()):
+                os.makedirs('data/'+video.getId())
         except OSError:
             print ('Error: Creating directory of data')
 
         cap = cv2.VideoCapture(video.path)
         frameRate = cap.get(5) #frame rate
-        x=1
+        length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) #get length of the video
+
+
         while(cap.isOpened()):
             frameId = cap.get(1) #current frame number
+            frameTime=cap.get(cv2.CAP_PROP_POS_MSEC)
+            time = self.convertTime(frameTime)
+
+
             ret, frame = cap.read()
             if (ret != True):
                 break
             if (frameId % math.floor(frameRate*8) == 0):
-                filename = './data/frame' +  str(int(x)) + ".jpg";
-                imagename='frame'+str(int(x)) + '.jpg'
-                image=Image(filename,imagename)
+                filename = 'data/'+video.getId()+'/frame' + str(frameId) + ".jpg";
+                imagename='frame'+str(frameId) + '.jpg'
+                image=Image(filename, imagename,time);
                 self.object_array.append(image)
                 self.images.append(imagename)
-                x+=1
                 cv2.imwrite(filename, frame)
 
         cap.release()
         print ("Done!")
         print (self.images)
-        print([x.name for x in self.object_array])
+        # os.chdir('../')
+        print([x.path for x in self.object_array])
+
+
 
     def compareImages(self):
         for i in range (0,len(self.object_array)-2):
             original = cv2.imread(self.object_array[i].path)
+            print(self.object_array[i].path)
             image_to_compare = cv2.imread(self.object_array[i+1].path)
-
+            print(self.object_array[i+1].path)
             # 1) Check if 2 images are equals
             if original.shape == image_to_compare.shape:
                 print("The images have same size and channels")
@@ -83,22 +109,55 @@ class VideoHandler:
                             good_points.append(m)
                     print (len(good_points))
                     if (len(good_points)>175):
-                        self.similarFrames.append(self.object_array[i+1].path)
-                        self.images.remove(self.object_array[i+1].name)
+                        self.similarFrames.append(self.object_array[i+1])
+                        # self.images.remove(self.object_array[i+1].name)
         for i in self.similarFrames:
-            os.remove(i)
-        print (self.images)
+            os.remove(i.path)
+            self.object_array.remove(i)
+        print (self.object_array)
 
-    def generateTextFile(self):
+    def generateTextFile(self,video):
         try:
             from PIL import Image
         except ImportError:
             import Image
         import pytesseract
-        f= open("Text.txt","a")
-        for x in self.images:
-            text = pytesseract.image_to_string(Image.open('./data/'+x))
-            f.write(text+"\n"+"---------------PAGE BREAK----------------------------------"+"\n")
+        # f = codecs.open("text/"+video.getId()+".vtt","w",'utf-8')
+        f = open("text/"+video.getId()+".vtt","w",encoding='utf-8')
+        txtFile = open("text/"+video.getId()+".txt","w",encoding='utf-8')
+        f.write("WEBVTT \n")
+        temp=''
+        tempText ='';
+        finalText = '';
+        for x in self.object_array:
+            text = pytesseract.image_to_string(Image.open(x.path))
+            if not (temp == ''):
+                newTime = temp+" --> "+x.time
+                text.rsplit()
+                te = text.split("\n")
+                text = ''
+                print(te)
+                for i in te:
+                    if not i == '':
+                        text+='- '+i+"\n"
+                temp = x.time
+                f.write("\n"+newTime+"\n"+finalText)
+                txtFile.write(finalText+"\n ------------------------------------ \n")
+                finalText = text
+            else:
+                temp = x.time
+                te = text.split("\n")
+                text = ''
+                print(te)
+                for i in te:
+                    if not i == '':
+                        text += '- '+ i + "\n"
+                temp = x.time
+                finalText = text
+
+            # f.write(text+"\n"+"---------------PAGE BREAK----------------------------------"+"\n")
         f.close()
-        textFile=open("Text.txt","r")
-        return textFile.readlines()
+        txtFile.close()
+        txtFile = open("text/"+video.getId()+".txt","r",encoding='utf-8')
+        s = txtFile.readlines()
+        return s

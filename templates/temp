@@ -1,0 +1,10 @@
+   <form action = "/editTextFile" method = "POST">
+      Text file of {{name}}
+      <br />
+      <textarea rows="20" cols="100" name="text">
+      {% for result in variable %}
+          {{ result }}
+        {% endfor %}
+      </textarea>
+      <input type = "submit" class="btn btn-primary" value = "Save Changes" />
+    </form>

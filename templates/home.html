@@ -13,10 +13,19 @@
       </div>
     </div>
   </header>
-<a href="uploadVideo-storage">
-  <button type="button" class="btn btn-primary btn-lg">Upload video from Storage</button>
-</a>
-<a href="uploadVideo-link">
-  <button type="button" class="btn btn-primary btn-lg">Upload video by Link</button>
-</a>
+<p align="center">
+  <a href="uploadVideo-storage">
+    <button type="button" class="btn btn-primary btn-lg">Upload video from Storage</button>
+  </a>
+  <a href="uploadVideo-link">
+    <button type="button" class="btn btn-primary btn-lg">Upload video by Link</button>
+  </a>
+</p>
+
+<script type="text/javascript">
+  if(localStorage.getItem("id")===null){
+    localStorage.setItem("id",{{user_id}})
+  }
+
+</script>
 {% endblock %}

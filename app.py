@@ -1,20 +1,33 @@
 import os
+import codecs
 import requests
 import pytube
-from flask import Flask , render_template , request , Response
+import random
+from flask import Flask , render_template , request , Response,send_file
 from pytube import YouTube
 from Video import Video
 from VideoHandler import VideoHandler
 from VideoCamera import VideoCamera
-
+from flask_sockets import Sockets
 app=Flask(__name__)
-
+sockets = Sockets(app)
 videoHandler = VideoHandler()
-
+global webSocket
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 @app.route('/')
 def home():
-    return render_template('home.html')
+    id= random.randint(1,1000)
+    return render_template('home.html',user_id=id)
+
+@sockets.route('/echo')
+def echo_socket(ws):
+    webSocket = ws;
+    while True:
+        message = ws.receive()
+        print(message)
+        for i in range(4):
+            ws.send("Charith");
+
 
 @app.route('/documentation')
 def documentation():
@@ -38,25 +51,23 @@ def uploadVideo_link():
 
 @app.route('/upload' , methods = ["POST"])
 def upload():
-    print (request)
+    user_id= request.form['user_id']
     target=os.path.join(APP_ROOT, 'videos/')
-    print (target)
 
     if not os.path.isdir(target):
         os.mkdir(target)
 
     for file in request.files.getlist("file"):
-        print (file)
         filename=file.filename
         destination = "/".join([target,filename])
-        print(destination)
         file.save(destination)
-        video = Video(filename,destination)
+        video = Video(filename,destination,user_id)
         videoHandler.addVideo(video)
-    return render_template("generateText.html",variable=video.path)
+    return render_template("generateText.html",variable=video.user)
 
 @app.route('/uploadByLink' , methods = ["POST"])
 def uploadByLink():
+    #user_id= request.form['user_id']
     target=os.path.join(APP_ROOT, 'videos/')
     if not os.path.isdir(target):
         os.mkdir(target)
@@ -72,13 +83,17 @@ def uploadByLink():
 
 @app.route("/generateTextFile" , methods=["POST"])
 def generateTextFile():
-    text = request.form['text']
-    print(text)
-    video=videoHandler.getVideoByName(text)
+    user_id = request.form['user_id']
+    print(user_id)
+    video=videoHandler.getVideoByUserId(user_id)
+    name=video.name;
+    print(name);
+    print(video);
     videoHandler.splitVideo(video)
     videoHandler.compareImages()
-    text=videoHandler.generateTextFile()
-    return render_template('editText.html',variable=text)
+    text = videoHandler.generateTextFile(video)
+    print(text)
+    return render_template('editText.html', variable=user_id, name=name, textData = text)
 
 @app.route("/editTextFile" , methods=["POST"])
 def editTextFile():
@@ -87,7 +102,7 @@ def editTextFile():
     f= open("Text.txt","w")
     f.write(editedText)
     f.close()
-    return editedText
+    return send_file('Text.txt',mimetype='text/plain',as_attachment=True)
 
 def gen(camera):
     while True:
@@ -95,11 +110,19 @@ def gen(camera):
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
-@app.route('/video_feed')
+@app.route('/video_feed',methods=['GET'])
 def video_feed():
-    name=videoHandler.videos[0].getName()
-    print (name)
-    return Response(gen(VideoCamera(name)),mimetype='multipart/x-mixed-replace; boundary=frame')
+    video = videoHandler.getVideoByUserId(request.args.get("id"))
+    return send_file(video.path,as_attachment=True)
+
+@app.route('/video_text',methods=['GET'])
+def video_text():
+    textId = request.args.get("id")
+    return send_file("text/"+textId+".vtt", attachment_filename=textId+".vtt", mimetype='text/vtt', as_attachment=True)
 
 if __name__ == '__main__':
+    # from gevent import pywsgi
+    # from geventwebsocket.handler import WebSocketHandler
+    # server = pywsgi.WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
+    # server.serve_forever()
     app.run(debug=True)

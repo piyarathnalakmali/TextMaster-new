@@ -1,14 +1,25 @@
-{% extends 'layout.html' %}
+
 {% block body %}
-  TEXT FILE GENERATED <br>
-  <form action = "/editTextFile" method = "POST">
-    Edit text file
-    <br />
-    <textarea rows="50" cols="200" name="text">
-      {% for result in variable%}
-        {{ result }}
-      {% endfor %}
-    </textarea>
-    <input type = "submit" value = "Save Changes" />
-  </form>
+  <div class="row">
+<div class="col-sm-6">
+    <video width="690" height="500" controls>
+  <source src="/video_feed?id={{variable}}" type="video/mp4">
+     <track src="/video_text?id={{ variable }}" default kind="captions" srclang="en" label="English" />
+Your browser does not support the video tag.
+</video>
+</div>
+    <div class="col-sm-6">
+        <form action = "/editTextFile" method = "POST">
+      Text file of {{name}}
+      <br />
+      <textarea rows="20" cols="100" name="text">
+      {% for result in textData %}
+          {{ result }}
+        {% endfor %}
+      </textarea>
+      <input type = "submit" class="btn btn-primary" value = "Save Changes" />
+    </form>
+    </div>
+  </div>
+
 {% endblock %}
