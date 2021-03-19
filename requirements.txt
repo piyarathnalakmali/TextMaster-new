@@ -24,7 +24,7 @@ opencv-contrib-python==3.4.2.16
 opencv-python==3.4.2.16
 opencv-python-headless==4.1.0.25
 pefile==2018.8.8
-Pillow==5.4.1
+Pillow==8.1.1
 pycparser==2.19
 PyInstaller==3.4
 pytesseract==0.2.6
